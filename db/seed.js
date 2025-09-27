@@ -18,7 +18,7 @@ await db.query(
 );
 const {rows: insertedUsers} = await db.query(
   format(
-    `INSERT INTO users (first_name, surname, email, phone_number, is_host, avatar, created_at) VALUES %L`,
+    `INSERT INTO users (first_name, surname, email, phone_number, is_host, avatar, created_at) VALUES %L RETURNING *`,
     usersData.map(({ first_name, surname, email, phone_number, is_host, avatar, created_at }) => [
       first_name, 
       surname, 

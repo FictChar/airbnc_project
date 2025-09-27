@@ -11,8 +11,8 @@ return users.reduce((lookUp, user)=> {
 }
 
 function formatProperties(properties, userLookUp) {
-  return properties.map(({host_id, name, location, property_type, price_per_night, description}) =>{
-    return [userLookUp[host_id], name, location, property_type, price_per_night, description];
+  return properties.map(({host_name, name, location, property_type, price_per_night, description}) =>{
+    return [userLookUp[host_name], name, location, property_type, price_per_night, description];
   });
 }
 

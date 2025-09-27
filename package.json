@@ -1,0 +1,28 @@
+{
+  "name": "airbnc_project",
+  "version": "1.0.0",
+  "description": "I'm creating and API for a property rental service.",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "seed": "node ./db/data/run_seed.js" 
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FictChar/airbnc_project.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/FictChar/airbnc_project/issues"
+  },
+  "homepage": "https://github.com/FictChar/airbnc_project#readme",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "jest": "^30.1.3",
+    "pg": "^8.16.3",
+    "pg-format": "^1.0.4"
+  }
+}

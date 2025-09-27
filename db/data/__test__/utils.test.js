@@ -22,28 +22,6 @@ describe("usersLookUp", () => {
   });
 });
 
-describe("propertiesLookUp", () => {
-  test("returns an empty object for an empty array", () => {
-    expect(propertiesLookUp([])).toEqual({});
-  });
-
-  test("returns property name mapped to property_id", () => {
-    const input = [{ property_id: 10, name: "Cosy Loft" }];
-    expect(propertiesLookUp(input)).toEqual({ "Cosy Loft": 10 });
-  });
-
-  test("handles multiple properties", () => {
-    const input = [
-      { property_id: 1, name: "Loft" },
-      { property_id: 2, name: "Villa" }
-    ];
-    expect(propertiesLookUp(input)).toEqual({
-      "Loft": 1,
-      "Villa": 2
-    });
-  });
-});
-
 describe("formatProperties", () => {
   test("formats properties into arrays with host_id replaced using lookUp", () => {
     const input = [
@@ -93,6 +71,30 @@ describe("formatProperties", () => {
     ]);
   });
 });
+
+describe("propertiesLookUp", () => {
+  test("returns an empty object for an empty array", () => {
+    expect(propertiesLookUp([])).toEqual({});
+  });
+
+  test("returns property name mapped to property_id", () => {
+    const input = [{ property_id: 10, name: "Cosy Loft" }];
+    expect(propertiesLookUp(input)).toEqual({ "Cosy Loft": 10 });
+  });
+
+  test("handles multiple properties", () => {
+    const input = [
+      { property_id: 1, name: "Loft" },
+      { property_id: 2, name: "Villa" }
+    ];
+    expect(propertiesLookUp(input)).toEqual({
+      "Loft": 1,
+      "Villa": 2
+    });
+  });
+});
+
+
 
 describe("formatReviews", () => {
   test("formats reviews into arrays with property_id and guest_id looked up", () => {
