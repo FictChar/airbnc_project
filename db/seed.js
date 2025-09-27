@@ -11,7 +11,7 @@ async function seed (propertyTypesData, usersData, propertiesData, reviewsData) 
     
 await db.query(
   format(
-    `INSERT INTO property_types (property_type, description) VALUES %L`,
+    `INSERT INTO property_types (property_type, description) VALUES %L RETURNING *`,
     propertyTypesData.map(({ property_type, description }) => 
       [property_type, description])
   )
@@ -53,7 +53,7 @@ const formattedReviews = formatReviews (reviewsData, usersLookUpMap, propertiesL
 
 await db.query(
   format(
-  `INSERT INTO reviews (property_id, usersLookUp[guest_id], rating, comment, created_at) VALUES %L`,
+  `INSERT INTO reviews (property_id, usersLookUp[guest_id], rating, comment, created_at) VALUES %L RETURNING *`,
   formattedReviews
    )
  );

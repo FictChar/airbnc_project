@@ -5,12 +5,12 @@ describe("usersLookUp", () => {
     expect(usersLookUp([])).toEqual({});
   });
 
-  test("returns a single key value pair with first_name + surname as key and user_id as value", () => {
+  test("Returns a single key value pair with first_name + surname as key and user_id as value", () => {
     const input = [{ user_id: 1, first_name: "Alice", surname: "Johnson" }];
     expect(usersLookUp(input)).toEqual({ "Alice Johnson": 1 });
   });
 
-  test("creates key-value pairs for each user in the array", () => {
+  test("Creates key-value pairs for each user in the array", () => {
     const input = [
       { user_id: 1, first_name: "Alice", surname: "Johnson" },
       { user_id: 2, first_name: "Bob", surname: "Smith" }
@@ -23,54 +23,75 @@ describe("usersLookUp", () => {
 });
 
 describe("formatProperties", () => {
-  test("formats properties into arrays with host_id replaced using lookUp", () => {
-    const input = [
+
+  test("Returns an empty array when passed an empty array", () => {
+    const properties = [];
+    const userLookUp = {};
+    const result = formatProperties(properties, userLookUp);
+    expect(result).toEqual([]);
+  });
+
+  test("Returns one formatted property when there is a single host match", () => {
+    const properties = [
       {
-        property_id: 1,
-        host_id: "Alice Johnson",
-        name: "Loft",
-        location: "London",
+        host_name: "Alice Johnson",
+        name: "Modern Apartment in City Center",
+        location: "London, UK",
         property_type: "Apartment",
         price_per_night: 120.0,
-        description: "Nice loft"
+        description: "Description of Modern Apartment in City Center. A sleek apartment with all modern amenities."
       }
     ];
-    const userLookUp = { "Alice Johnson": 101 };
 
-    expect(formatProperties(input, userLookUp)).toEqual([
-      [1, 101, "Loft", "London", "Apartment", 120.0, "Nice loft"]
+    const userLookUp = {
+      "Alice Johnson": 1 // key = name+surname, value = host_id
+    };
+
+    const result = formatProperties(properties, userLookUp);
+
+    expect(result).toEqual([
+      [1, "Modern Apartment in City Center", "London, UK", "Apartment", 120.0, "Description of Modern Apartment in City Center. A sleek apartment with all modern amenities."]
     ]);
   });
 
-  test("works with multiple properties", () => {
-    const input = [
+  test('Works correctly with multiple properties and hosts', () => {
+    const properties = [
       {
-        property_id: 1,
-        host_id: "Alice Johnson",
-        name: "Loft",
-        location: "London",
+        host_name: "Alice Johnson",
+        name: "Modern Apartment in City Center",
+        location: "London, UK",
         property_type: "Apartment",
         price_per_night: 120.0,
-        description: "Nice loft"
+        description: "Description of Modern Apartment in City Center. A sleek apartment with all modern amenities."
       },
       {
-        property_id: 2,
-        host_id: "Bob Smith",
-        name: "Villa",
-        location: "Manchester",
-        property_type: "House",
-        price_per_night: 200.0,
-        description: "Big villa"
-      }
+        host_name: "Emma Davis",
+        name: "Elegant City Apartment",
+        location: "Birmingham, UK",
+        property_type: "Apartment",
+        price_per_night: 110.0,
+        description: "Stylish apartment located in the heart of Birmingham, close to all attractions."
+        }
     ];
-    const userLookUp = { "Alice Johnson": 101, "Bob Smith": 202 };
 
-    expect(formatProperties(input, userLookUp)).toEqual([
-      [1, 101, "Loft", "London", "Apartment", 120.0, "Nice loft"],
-      [2, 202,  "Villa", "Manchester", "House", 200.0, "Big villa"]
+    const userLookUp = {
+      "Alice Johnson": 1,
+      "Emma Davis": 3
+    };
+
+    const result = formatProperties(properties, userLookUp);
+
+    expect(result).toEqual([
+      [1, "Modern Apartment in City Center","London, UK","Apartment", 120.0,"Description of Modern Apartment in City Center. A sleek apartment with all modern amenities."
+     ],
+      [3, "Elegant City Apartment","Birmingham, UK","Apartment", 110.0,"Stylish apartment located in the heart of Birmingham, close to all attractions."
+        
+      ]
     ]);
   });
 });
+
+
 
 describe("propertiesLookUp", () => {
   test("returns an empty object for an empty array", () => {
@@ -93,7 +114,6 @@ describe("propertiesLookUp", () => {
     });
   });
 });
-
 
 
 describe("formatReviews", () => {

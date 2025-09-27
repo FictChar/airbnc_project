@@ -11,10 +11,26 @@ return users.reduce((lookUp, user)=> {
 }
 
 function formatProperties(properties, userLookUp) {
-  return properties.map(({host_name, name, location, property_type, price_per_night, description}) =>{
-    return [userLookUp[host_name], name, location, property_type, price_per_night, description];
+  return properties.map(({ 
+    host_name, 
+    name, 
+    location, 
+    property_type, 
+    price_per_night, 
+    description 
+  }) => {
+    const host_id = userLookUp[host_name];
+    return [
+      host_id,   
+      name,
+      location,
+      property_type,
+      price_per_night,
+      description
+    ];
   });
 }
+
 
 function propertiesLookUp(properties) {
    return properties.reduce((lookUp, property)=>{
