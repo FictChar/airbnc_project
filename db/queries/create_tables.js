@@ -34,6 +34,13 @@ async function createTables () {
         rating INT NOT NULL,
         comment TEXT,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);`);
+
+    await db.query(`CREATE TABLE images(
+        image_id SERIAL PRIMARY KEY,
+        property_id INT NOT NULL REFERENCES properties(property_id),
+        image_url VARCHAR NOT NULL,
+        alt_text VARCHAR NOT NULL);`);
+
 }
 
 module.exports = createTables

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
+    "setup-dbs": "psql -f ./db/setup.sql",
     "seed": "node ./db/data/run_seed.js" 
   },
   "repository": {

@@ -162,5 +162,51 @@ describe("formatReviews", () => {
   });
 });
 
+describe("createPropertyIdRef", () => {
+  test("formats reviews into arrays with property_id and guest_id looked up", () => {
+    const input = [
+      {
+        property_id: "Loft",
+        guest_id: "Alice Johnson",
+        rating: 5,
+        comment: "Great!",
+        created_at: "2024-01-01"
+      }
+    ];
+    const userLookUp = { "Alice Johnson": 101 };
+    const propertyLookUp = { "Loft": 201 };
+
+    expect(formatReviews(input, userLookUp, propertyLookUp)).toEqual([
+      [201, 101, 5, "Great!", "2024-01-01"]
+    ]);
+  });
+
+  test("handles multiple reviews", () => {
+    const input = [
+      {
+        property_id: "Loft",
+        guest_id: "Alice Johnson",
+        rating: 5,
+        comment: "Great!",
+        created_at: "2024-01-01"
+      },
+      {
+        property_id: "Villa",
+        guest_id: "Bob Smith",
+        rating: 4,
+        comment: "Nice stay",
+        created_at: "2024-02-01"
+      }
+    ];
+    const userLookUp = { "Alice Johnson": 101, "Bob Smith": 202 };
+    const propertyLookUp = { "Loft": 201, "Villa": 301 };
+
+    expect(formatReviews(input, userLookUp, propertyLookUp)).toEqual([
+      [201, 101, 5, "Great!", "2024-01-01"],
+      [301, 202, 4, "Nice stay", "2024-02-01"]
+    ]);
+  });
+});
+
 
 

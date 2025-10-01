@@ -2,7 +2,7 @@ const db = require("./connection.js");
 const format = require("pg-format");
 const dropTables = require("./queries/drop_tables.js")
 const createTables = require("./queries/create_tables.js")
-const { usersLookUp, formatProperties, propertiesLookUp, formatReviews} = require("./data/utils/utils.js")
+const { formatProperties, propertiesLookUp, formatReviews } = require("./data/utils/utils.js")
 
 async function seed (propertyTypesData, usersData, propertiesData, reviewsData) {
 
@@ -53,10 +53,24 @@ const formattedReviews = formatReviews (reviewsData, usersLookUpMap, propertiesL
 
 await db.query(
   format(
-  `INSERT INTO reviews (property_id, usersLookUp[guest_id], rating, comment, created_at) VALUES %L RETURNING *`,
+  `INSERT INTO reviews (property_id, guest_id, rating, comment, created_at) VALUES %L RETURNING *`,
   formattedReviews
    )
  );
+
+ const { rows: insertedProperties } = await db.query{
+  format(`CREATE TABLE images(
+        image_id SERIAL PRIMARY KEY,
+        property_id INT NOT NULL REFERENCES properties(property_id),
+        image_url VARCHAR NOT NULL,
+        alt_text VARCHAR NOT NULL) VALUES %L RETURNING *`,
+  imagesData.map(({ image_id, property_id, image_url, alt_text}) => [
+        image_id, 
+        property_id,
+        image_url,
+        alt_text]);
+
+
 }
 
 module.exports = seed

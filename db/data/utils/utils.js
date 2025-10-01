@@ -41,10 +41,12 @@ function propertiesLookUp(properties) {
 }
 
 function formatReviews(reviews, usersLookUpMap, propertiesLookUpMap) {
-  return reviews.map(({ property_id, guest_id, rating, comment, created_at }) => {
+  return reviews.map(({ guest_name, property_name, rating, comment, created_at }) => {
+    const property_id = propertiesLookUpMap[property_name];
+    const guest_id =  usersLookUpMap[guest_name];
     return [
-      propertiesLookUpMap[property_id], 
-      usersLookUpMap[guest_id],        
+      property_id,
+      guest_id,      
       rating,
       comment,
       created_at
@@ -52,5 +54,9 @@ function formatReviews(reviews, usersLookUpMap, propertiesLookUpMap) {
   });
 }
 
+function createPropertyIdRef = {
 
-module.exports = { usersLookUp, formatProperties, propertiesLookUp, formatReviews };
+}
+
+
+module.exports = { usersLookUp, formatProperties, propertiesLookUp, formatReviews, createPropertyIdRef};
