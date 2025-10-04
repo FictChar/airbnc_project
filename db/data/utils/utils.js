@@ -1,6 +1,6 @@
 const db = require("../../connection.js");
 const format = require('pg-format');
-const { usersData, propertiesData, reviewsData } = require("../test/index.js");
+const { usersData, propertiesData, reviewsData, imagesData } = require("../test/index.js");
 
 function usersLookUp (users) {
 return users.reduce((lookUp, user)=> {
@@ -41,7 +41,12 @@ function propertiesLookUp(properties) {
 }
 
 function formatReviews(reviews, usersLookUpMap, propertiesLookUpMap) {
-  return reviews.map(({ guest_name, property_name, rating, comment, created_at }) => {
+  return reviews.map(({ 
+    guest_name, 
+    property_name, 
+    rating, 
+    comment, 
+    created_at }) => {
     const property_id = propertiesLookUpMap[property_name];
     const guest_id =  usersLookUpMap[guest_name];
     return [
@@ -54,9 +59,20 @@ function formatReviews(reviews, usersLookUpMap, propertiesLookUpMap) {
   });
 }
 
-function createPropertyIdRef = {
+function createPropertyIdRef(properties) {
+  return properties.reduce((propertyLookUp, property) => {
+    const { name, property_id } = property;
+    propertyLookUp[name] = property_id;
+    return propertyLookUp;
+  }, {});
+}
 
+function formattedImages(imagesData, propertyLookUp) {
+return imagesData.map(({ property_name, image_url, alt_tag }) => {
+    const property_id = propertyLookUp[property_name];
+    return [property_id, image_url, alt_tag];
+  });
 }
 
 
-module.exports = { usersLookUp, formatProperties, propertiesLookUp, formatReviews, createPropertyIdRef};
+module.exports = { usersLookUp, formatProperties, propertiesLookUp, formatReviews, createPropertyIdRef, formattedImages};

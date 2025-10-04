@@ -2,7 +2,8 @@ const db = require("./connection.js");
 const format = require("pg-format");
 const dropTables = require("./queries/drop_tables.js")
 const createTables = require("./queries/create_tables.js")
-const { formatProperties, propertiesLookUp, formatReviews } = require("./data/utils/utils.js")
+const { usersData, propertiesData, reviewsData, imagesData } = require("./data/test/index.js")
+const { formatProperties, propertiesLookUp, formatReviews, createPropertyIdRef, formattedImages} = require("./data/utils/utils.js")
 
 async function seed (propertyTypesData, usersData, propertiesData, reviewsData) {
 
@@ -58,19 +59,21 @@ await db.query(
    )
  );
 
- const { rows: insertedProperties } = await db.query{
-  format(`CREATE TABLE images(
-        image_id SERIAL PRIMARY KEY,
-        property_id INT NOT NULL REFERENCES properties(property_id),
-        image_url VARCHAR NOT NULL,
-        alt_text VARCHAR NOT NULL) VALUES %L RETURNING *`,
-  imagesData.map(({ image_id, property_id, image_url, alt_text}) => [
-        image_id, 
-        property_id,
-        image_url,
-        alt_text]);
+const propertyIdRef = createPropertyIdRef(insertedProperties);
 
+const formattedImagesData = formattedImages(imagesData, propertyIdRef);
 
+//imagesData.map(({ property_name, image_url, alt_text }) => {
+  //const property_id = propertyIdRef[property_name];
+  //return [property_id, image_url, alt_text];
+//});
+
+await db.query(
+  format(
+    `INSERT INTO images (property_id, image_url, alt_text) VALUES %L RETURNING *`,
+    formattedImagesData
+  )
+);
 }
 
 module.exports = seed

@@ -1,4 +1,4 @@
-const { usersLookUp, formatProperties, propertiesLookUp, formatReviews } = require("../utils/utils.js");
+const { usersLookUp, formatProperties, propertiesLookUp, formatReviews, createPropertyIdRef, formattedImages } = require("../utils/utils.js");
 
 describe("usersLookUp", () => {
   test("returns an empty object for an empty array", () => {
@@ -23,7 +23,6 @@ describe("usersLookUp", () => {
 });
 
 describe("formatProperties", () => {
-
   test("Returns an empty array when passed an empty array", () => {
     const properties = [];
     const userLookUp = {};
@@ -31,7 +30,7 @@ describe("formatProperties", () => {
     expect(result).toEqual([]);
   });
 
-  test("Returns one formatted property when there is a single host match", () => {
+  test("Returns one formatted property when a single host match", () => {
     const properties = [
       {
         host_name: "Alice Johnson",
@@ -43,9 +42,7 @@ describe("formatProperties", () => {
       }
     ];
 
-    const userLookUp = {
-      "Alice Johnson": 1 // key = name+surname, value = host_id
-    };
+    const userLookUp = { "Alice Johnson": 1 };
 
     const result = formatProperties(properties, userLookUp);
 
@@ -54,7 +51,7 @@ describe("formatProperties", () => {
     ]);
   });
 
-  test('Works correctly with multiple properties and hosts', () => {
+  test('Return correctly multiple properties and hosts', () => {
     const properties = [
       {
         host_name: "Alice Johnson",
@@ -71,27 +68,19 @@ describe("formatProperties", () => {
         property_type: "Apartment",
         price_per_night: 110.0,
         description: "Stylish apartment located in the heart of Birmingham, close to all attractions."
-        }
+      }
     ];
 
-    const userLookUp = {
-      "Alice Johnson": 1,
-      "Emma Davis": 3
-    };
+    const userLookUp = { "Alice Johnson": 1, "Emma Davis": 3 };
 
     const result = formatProperties(properties, userLookUp);
 
     expect(result).toEqual([
-      [1, "Modern Apartment in City Center","London, UK","Apartment", 120.0,"Description of Modern Apartment in City Center. A sleek apartment with all modern amenities."
-     ],
-      [3, "Elegant City Apartment","Birmingham, UK","Apartment", 110.0,"Stylish apartment located in the heart of Birmingham, close to all attractions."
-        
-      ]
+      [1, "Modern Apartment in City Center","London, UK","Apartment", 120.0,"Description of Modern Apartment in City Center. A sleek apartment with all modern amenities."],
+      [3, "Elegant City Apartment","Birmingham, UK","Apartment", 110.0,"Stylish apartment located in the heart of Birmingham, close to all attractions."]
     ]);
   });
 });
-
-
 
 describe("propertiesLookUp", () => {
   test("returns an empty object for an empty array", () => {
@@ -108,20 +97,16 @@ describe("propertiesLookUp", () => {
       { property_id: 1, name: "Loft" },
       { property_id: 2, name: "Villa" }
     ];
-    expect(propertiesLookUp(input)).toEqual({
-      "Loft": 1,
-      "Villa": 2
-    });
+    expect(propertiesLookUp(input)).toEqual({ "Loft": 1, "Villa": 2 });
   });
 });
 
-
 describe("formatReviews", () => {
-  test("formats reviews into arrays with property_id and guest_id looked up", () => {
+  test("format reviews into arrays containing property_id and guest_id", () => {
     const input = [
       {
-        property_id: "Loft",
-        guest_id: "Alice Johnson",
+        property_name: "Loft",
+        guest_name: "Alice Johnson",
         rating: 5,
         comment: "Great!",
         created_at: "2024-01-01"
@@ -138,15 +123,15 @@ describe("formatReviews", () => {
   test("handles multiple reviews", () => {
     const input = [
       {
-        property_id: "Loft",
-        guest_id: "Alice Johnson",
+        property_name: "Loft",
+        guest_name: "Alice Johnson",
         rating: 5,
         comment: "Great!",
         created_at: "2024-01-01"
       },
       {
-        property_id: "Villa",
-        guest_id: "Bob Smith",
+        property_name: "Villa",
+        guest_name: "Bob Smith",
         rating: 4,
         comment: "Nice stay",
         created_at: "2024-02-01"
@@ -163,50 +148,85 @@ describe("formatReviews", () => {
 });
 
 describe("createPropertyIdRef", () => {
-  test("formats reviews into arrays with property_id and guest_id looked up", () => {
-    const input = [
-      {
-        property_id: "Loft",
-        guest_id: "Alice Johnson",
-        rating: 5,
-        comment: "Great!",
-        created_at: "2024-01-01"
-      }
-    ];
-    const userLookUp = { "Alice Johnson": 101 };
-    const propertyLookUp = { "Loft": 201 };
-
-    expect(formatReviews(input, userLookUp, propertyLookUp)).toEqual([
-      [201, 101, 5, "Great!", "2024-01-01"]
-    ]);
+  test("returns an empty object for an empty array", () => {
+    expect(createPropertyIdRef([])).toEqual({});
   });
 
-  test("handles multiple reviews", () => {
+  test("Returns a single key value pair with property_name as key and property_id as value", () => {
+    const input = [{ name: "Chic Studio Near the Beach", property_id: 3 }];
+    expect(createPropertyIdRef(input)).toEqual({ "Chic Studio Near the Beach": 3 });
+  });
+
+  test("Returns multiple key value pair with property_name as key and property_id as value", () => {
     const input = [
+      { name: "Modern Apartment in City Center", property_id: 1 },
+      { name:"Chic Studio Near the Beach", property_id: 3 },
+      { name: "Luxury Penthouse with View", property_id: 6 }
+    ];
+    expect(createPropertyIdRef(input)).toEqual({ 
+      "Chic Studio Near the Beach": 3,
+      "Modern Apartment in City Center": 1,
+      "Luxury Penthouse with View": 6
+    });
+  });
+}); 
+
+describe("formattedImages", () => {
+  test("returns an empty array for empty input", () => {
+    const imagesData = [];
+    const result = imagesData.map(({ property_name, image_url, alt_tag }) => {
+      return { property_name, image_url, alt_tag };
+    });
+    expect(result).toEqual([]);
+  });
+
+  test("Format a single image data into an array containing the property_id", () => {
+    const imagesData = [
       {
-        property_id: "Loft",
-        guest_id: "Alice Johnson",
-        rating: 5,
-        comment: "Great!",
-        created_at: "2024-01-01"
-      },
-      {
-        property_id: "Villa",
-        guest_id: "Bob Smith",
-        rating: 4,
-        comment: "Nice stay",
-        created_at: "2024-02-01"
+        property_name: "Modern Apartment in City Center",
+        image_url : "https://example.com/images/modern_apartment_1.jpg",
+        alt_tag: "Alt tag for Modern Apartment in City Center"
       }
     ];
-    const userLookUp = { "Alice Johnson": 101, "Bob Smith": 202 };
-    const propertyLookUp = { "Loft": 201, "Villa": 301 };
-
-    expect(formatReviews(input, userLookUp, propertyLookUp)).toEqual([
-      [201, 101, 5, "Great!", "2024-01-01"],
-      [301, 202, 4, "Nice stay", "2024-02-01"]
+    const propertyLookUp = { "Modern Apartment in City Center": 1 };
+    const formattedImagesData = formattedImages(imagesData, propertyLookUp)
+    expect(formattedImagesData).toEqual([
+      [1, "https://example.com/images/modern_apartment_1.jpg",
+    "Alt tag for Modern Apartment in City Center"]
+    ]);
+  });
+    test("Format multiple images data into arrays containing the property_id", () => {
+    const imagesData = [
+      {
+        property_name: "Modern Apartment in City Center",
+        image_url : "https://example.com/images/modern_apartment_1.jpg",
+        alt_tag: "Alt tag for Modern Apartment in City Center"
+      },
+       {
+        property_name: "Cosy Family House",
+        image_url : "https://example.com/images/cosy_family_house_1.jpg",
+        alt_tag: "Alt tag for Cosy Family House"
+      },
+       {
+        property_name: "Chic Studio Near the Beach",
+        image_url : "https://example.com/images/chic_studio_1.jpg",
+        alt_tag: "Alt tag for Chic Studio Near the Beach"
+      }
+    ];
+    const propertyLookUp = { 
+      "Modern Apartment in City Center": 1,
+      "Cosy Family House": 2,
+      "Chic Studio Near the Beach":3
+     };
+    const formattedImagesData = formattedImages(imagesData, propertyLookUp)
+    expect(formattedImagesData).toEqual([
+      [1, "https://example.com/images/modern_apartment_1.jpg",
+    "Alt tag for Modern Apartment in City Center"],
+      [2, "https://example.com/images/cosy_family_house_1.jpg",
+      "Alt tag for Cosy Family House"],
+      [3, "https://example.com/images/chic_studio_1.jpg",
+      "Alt tag for Chic Studio Near the Beach"]
     ]);
   });
 });
-
-
 
