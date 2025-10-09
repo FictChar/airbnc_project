@@ -1,8 +1,8 @@
 const seed = require('./seed.js');
 const db = require('./connection.js');
-const { propertyTypesData, usersData, propertiesData, reviewsData } = require ('./data/test/index.js');
+const { propertyTypesData, usersData, propertiesData, reviewsData, imagesData } = require("./data/index.js");
 
-seed(propertyTypesData, usersData, propertiesData, reviewsData)
+seed(propertyTypesData, usersData, propertiesData, reviewsData, imagesData)
 .then(() => {
     console.log("Data seeding complete!");
     db.end();

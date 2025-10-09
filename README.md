@@ -27,7 +27,25 @@ I started to buld the INSERT INTO queries on the seed.js file. property_type and
 
 Buld every function from the most simple step to the most complex and tested it. Once all of them were working I added them to the seed and run the seed-run using the command node run-seed.js.
 
-This can also be tested on pqsl by connectin to the databse and querying the data. 
+This can also be tested on pqsl by connecting to the database and querying the data. 
+
+# Querying the data
+
+# Creating a dev dtb
+
+Add new dev database to the setup.sql file
+
+npm run create-dbs to test
+
+Add a new seed script to differentiate the test and dev, and which database we want to insert and what data. 
+
+Moving on we'll need to create a new variable envioronment .env for the dev db. Change .env to .env.test and create .env.development, each of them will provide info for one of the db.
+
+Set an envioronment variable on the seed-test and seed-dev scripts on the package.json.
+
+Then store ENV as a variable on the connection file.
+
+It's time to create a new index.js file inside the data folder to store the test and dev data making it accesible when needed. Also created an ENV variable here that help us get the right data depending on the command we run. 
 
 
 

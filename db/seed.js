@@ -63,11 +63,6 @@ const propertyIdRef = createPropertyIdRef(insertedProperties);
 
 const formattedImagesData = formattedImages(imagesData, propertyIdRef);
 
-//imagesData.map(({ property_name, image_url, alt_text }) => {
-  //const property_id = propertyIdRef[property_name];
-  //return [property_id, image_url, alt_text];
-//});
-
 await db.query(
   format(
     `INSERT INTO images (property_id, image_url, alt_text) VALUES %L RETURNING *`,
