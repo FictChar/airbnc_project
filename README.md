@@ -10,7 +10,7 @@ Update scripts on package.json
  "scripts": {
     "test": "jest",
     "setup-dbs": "psql -f ./db/setup.sql",
-    "seed": "node ./db/data/run_seed.js" 
+    "seed": "node ./db/data/seed-run.js" 
   },
 
 Install pg and dotenv npm i pg and npm i dotenv and add a .env file to add the db.
@@ -30,6 +30,8 @@ Buld every function from the most simple step to the most complex and tested it.
 This can also be tested on pqsl by connecting to the database and querying the data. 
 
 # Querying the data
+
+Created an app.js, app.test.js, model folder and controller folder to start querying the data and receiving status when completed or failed.
 
 # Creating a dev dtb
 

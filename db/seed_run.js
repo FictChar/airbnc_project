@@ -1,6 +1,6 @@
 const seed = require('./seed.js');
 const db = require('./connection.js');
-const { propertyTypesData, usersData, propertiesData, reviewsData, imagesData } = require("./data/index.js");
+const { propertyTypesData, usersData, propertiesData, reviewsData, imagesData } = require("../db/data/test/index.js");
 
 seed(propertyTypesData, usersData, propertiesData, reviewsData, imagesData)
 .then(() => {

@@ -1,5 +1,15 @@
 const request = require ("supertest");
-const app = require("../../../app.js");
+const app = require("../../../app");
+const db = require("../../connection");
+const seed = require("../../seed");
+const testData = require("../test")
+
+beforeAll(async () => {
+  const { body } = await request(app).get("/api/properties");
+  testProperty = body.properties[0]; 
+});
+
+afterAll(() => db.end ());
 
 describe("app", () => {
 
@@ -7,49 +17,75 @@ describe("app", () => {
      test("responds with 200 OK status", async () => {
         await request(app).get("/api/properties").expect(200);
    });
-      test("responds with an array on the key of properties", async () => {
+         test("responds with and array of property objects", async () => {
         const {body} = await request(app).get("/api/properties");
         expect(Array.isArray(body.properties)).toBe(true);
    });  
-   test("each property obaject has the correct keys", async () => {
-    const { body } = await request(app).get("/api/properties");
-    body.properties.forEach((property, index) => {
-      const keys = Object.keys(property);
-      expect(keys).toEqual([
+      test("each property object has the correct keys", async () => {
+      const { body } = await request(app).get("/api/properties");
+      body.properties.forEach((property) => {
+      expect(Object.keys(property)).toEqual([
         "property_id",
         "property_name",
         "location",
         "price_per_night",
         "host"
       ]);
+    });
+  });
+      test("each property value has the correct type and valid data", async () => {
+      const {body} = await request(app).get("/api/properties");
+      body.properties.forEach((property) => {
+      
+      expect(typeof property.property_id).toBe("number");
+      expect(typeof property.property_name).toBe("string");
+      expect(typeof property.location).toBe("string");
+      expect(typeof property.price_per_night).toBe("number");
+      expect(typeof property.host).toBe("string");
+     });  
+  });
+ });
 
+
+describe("GET /api/properties/:id", () => {
+  let testProperty;
+
+  beforeAll(async () => {
+    const { body } = await request(app).get("/api/properties/1");
+    testProperty = body.properties;
+  });
+
+  test("responds with 200 OK status", async () => {
+    await request(app)
+      .get(`/api/properties/${testProperty.property_id}`)
+      .expect(200);
+  });
+
+  test("responds with an object containing a single property", async () => {
+    const { body } = await request(app).get(`/api/properties/${testProperty.property_id}`);
+    expect(body.property).toBeInstanceOf(Object);
+  });
+
+  test("check that the single property object has the correct keys", async () => {
+    expect(Object.keys(testProperty)).toEqual([
+      "property_id",
+      "property_name",
+      "location",
+      "price_per_night",
+      "description",
+      "host",
+      "host_avatar",
+    ]);
+  });
+
+  test("each property value has the expected data type", async () => {
+    expect(typeof testProperty.property_id).toBe("number");
+    expect(typeof testProperty.property_name).toBe("string");
+    expect(typeof testProperty.location).toBe("string");
+    expect(typeof testProperty.price_per_night).toBe("number");
+    expect(typeof testProperty.description).toBe("string");
+    expect(typeof testProperty.host).toBe("string");
+    expect(typeof testProperty.host_avatar).toBe("string");
   });
 });
-
-// Properties have 8 properties but we only need 5 of them
-
-// test("responds with an array on the key of properties with 5 object properties", async () => {
-//         const {body} = await request(app).get("/api/properties");
-//         expect(Array.isArray(body.properties)).toBe(true);
-//    });  
-
-// test("responds with an array on the key of properties where the 5 properties have the right order property_id, property_name, location, price_per_night and host", async () => {
-//  const {body} = await request(app).get("/api/properties");
-//   expect(Array.isArray(body.properties)).toBe(true);
-//    });  
-
-// "property_id": <id>,
-// "property_name": <name>
-// "location": <location>
-// "price_per_night": <price>
-// "host": <host name>"
-
-// test("properties should come back ordered by most favourited to least by default", async () => {
-//  const {body} = await request(app).get("/api/properties");
-//   expect(Array.isArray(body.properties)).toBe(true);
-//    });  
-
-// Once all of the tests are run, the connection to the pool must be actively closed. This can be done within an afterAll block in the test suite. afterAll takes a function, within which the .end method can be invoked on the connection to the database required in at the top of the file.
-// const connection = require('../db/connection.js');
-
-// afterAll(() => connection.end());
+});

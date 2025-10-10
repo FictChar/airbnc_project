@@ -9,6 +9,7 @@
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed-test": "NODE_ENV=test node ./db/data/seed_run.js",
     "seed-dev": "NODE_ENV=development node ./db/data/seed_run.js",
+    "seed-prod":"NODE_ENV=production node .db/data/seed_run.js",
     "dev": "nodemon listen.js"
   },
   "repository": {
