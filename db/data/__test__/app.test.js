@@ -1,8 +1,6 @@
 const request = require ("supertest");
 const app = require("../../../app");
 const db = require("../../connection");
-const seed = require("../../seed");
-const testData = require("../test")
 
 beforeAll(async () => {
   const { body } = await request(app).get("/api/properties");
@@ -48,26 +46,25 @@ describe("app", () => {
 
 
 describe("GET /api/properties/:id", () => {
-  let testProperty;
-
-  beforeAll(async () => {
-    const { body } = await request(app).get("/api/properties/1");
-    testProperty = body.properties;
-  });
-
-  test("responds with 200 OK status", async () => {
-    await request(app)
-      .get(`/api/properties/${testProperty.property_id}`)
-      .expect(200);
+  test("responds with 200 OK status when given a valid property_id", async () => {
+    const propertyId = 1;
+    const response = await request(app).get(`/api/properties/${propertyId}`);
+      expect(response.status).toBe(200);
   });
 
   test("responds with an object containing a single property", async () => {
-    const { body } = await request(app).get(`/api/properties/${testProperty.property_id}`);
-    expect(body.property).toBeInstanceOf(Object);
+    const propertyId = 1;
+    const response = await request(app).get(`/api/properties/${propertyId}`);
+      expect(typeof response.body).toBe("object");
+      expect(response.body).toHaveProperty("property");
+      expect(typeof response.body.property).toBe("object");
   });
 
   test("check that the single property object has the correct keys", async () => {
-    expect(Object.keys(testProperty)).toEqual([
+    const propertyId = 1;
+    const { body } = await request(app).get(`/api/properties/${propertyId}`);
+    
+    const expectedKeys = [
       "property_id",
       "property_name",
       "location",
@@ -75,17 +72,23 @@ describe("GET /api/properties/:id", () => {
       "description",
       "host",
       "host_avatar",
-    ]);
+    ];
+
+    expect(Object.keys(body.property)).toEqual(expectedKeys)
   });
 
   test("each property value has the expected data type", async () => {
-    expect(typeof testProperty.property_id).toBe("number");
-    expect(typeof testProperty.property_name).toBe("string");
-    expect(typeof testProperty.location).toBe("string");
-    expect(typeof testProperty.price_per_night).toBe("number");
-    expect(typeof testProperty.description).toBe("string");
-    expect(typeof testProperty.host).toBe("string");
-    expect(typeof testProperty.host_avatar).toBe("string");
+    const propertyId = 1;
+    const { body } = await request(app).get(`/api/properties/${propertyId}`);
+    const property = body.property;
+
+    expect(typeof property.property_id).toBe("number");
+    expect(typeof property.property_name).toBe("string");
+    expect(typeof property.location).toBe("string");
+    expect(typeof property.price_per_night).toBe("number");
+    expect(typeof property.description).toBe("string");
+    expect(typeof property.host).toBe("string");
+    expect(typeof property.host_avatar).toBe("string");
   });
 });
 });
