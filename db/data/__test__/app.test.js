@@ -41,6 +41,7 @@ describe("app", () => {
       expect(typeof property.price_per_night).toBe("number");
       expect(typeof property.host).toBe("string");
      });  
+  
   });
  });
 
@@ -73,7 +74,6 @@ describe("GET /api/properties/:id", () => {
       "host",
       "host_avatar",
     ];
-
     expect(Object.keys(body.property)).toEqual(expectedKeys)
   });
 
@@ -89,6 +89,30 @@ describe("GET /api/properties/:id", () => {
     expect(typeof property.description).toBe("string");
     expect(typeof property.host).toBe("string");
     expect(typeof property.host_avatar).toBe("string");
+  });
+});
+
+describe("Error handling, GET /api/properties/", () => {
+  test("respond with 400 bad request when path not found", async () => {
+    const response = await request(app).get("/api/notfound");
+    expect(response.status).toBe(400);
+    expect(response.body.msg).toBe("Bad request.");
+  });
+});
+
+
+describe("Error handling, GET /api/properties/:id", () => {
+
+  test("responds with 404 not found on GET /api/properties/:id if property_id doesn't exists", async () => {
+    const propertyIdNotAvailable = 99999;
+    const response = await request(app).get(`/api/properties/${propertyIdNotAvailable}`);
+      expect(response.status).toBe(404);
+  });
+
+  test("responds with 400 bad request on GET /api/properties/:id if property_id is not a number", async () => {
+    const response = await request(app).get(`/api/properties/notanumber`);
+      expect(response.status).toBe(400);
+      expect(response.body).toHaveProperty("msg", "Bad request.");
   });
 });
 });

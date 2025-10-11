@@ -13,7 +13,17 @@ async function getProperties(req, res, next) {
 async function fetchPropertyById(req, res, next) {
   try {
     const propertyId = parseInt(req.params.id); 
+
+    if(isNaN(propertyId)) {
+      return res.status(400).send({ msg : "Bad request."});
+    }
+
     const property = await getPropertyById(propertyId);
+
+    if(!property) {
+      return res.status(404).send({ msg : "Property not found!" });
+    }
+
     res.status(200).send({ property });
   } catch (err) {
     next(err);
