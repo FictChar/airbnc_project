@@ -34,5 +34,38 @@ async function getPropertyById(propertyId) {
   return rows[0];
 }
 
+async function getReviewsByPropertyId(propertyId) {
+  const reviewsQuery = 
+  `SELECT 
+     r.review_id, 
+     r.comment, 
+     r.rating, 
+     r.created_at, 
+     (u.first_name || ' ' || u.surname) AS guest,
+     u.avatar AS guest_avatar
+     FROM reviews r
+     JOIN users u ON r.guest_id = u.user_id
+     WHERE r.property_id = $1
+     ORDER BY r.created_at DESC;
+     `;
 
-module.exports = { getAllProperties, getPropertyById };
+  const averageReviewsRating = 
+  `SELECT ROUND (AVG(rating)::numeric) AS average_rating
+   FROM reviews
+   WHERE property_id = $1;
+   `;
+
+   const reviewsResult = await db.query(reviewsQuery, [propertyId]);
+   const averageRatingResult = await db.query(averageReviewsRating, [propertyId]);
+
+  return { 
+    reviews : reviewsResult.rows, 
+    average_rating : averageRatingResult.rows[0].average_rating
+    ? parseFloat(averageRatingResult.rows[0].average_rating)
+    : 0
+   };
+}
+
+
+
+module.exports = { getAllProperties, getPropertyById, getReviewsByPropertyId };

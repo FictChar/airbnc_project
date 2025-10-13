@@ -1,4 +1,4 @@
-const { getAllProperties, getPropertyById } = require("../models/properties");
+const { getAllProperties, getPropertyById, getReviewsByPropertyId } = require("../models/properties");
 
 async function getProperties(req, res, next) {
   try {
@@ -30,5 +30,30 @@ async function fetchPropertyById(req, res, next) {
   }
 }
 
-module.exports = { getProperties, fetchPropertyById };
+async function fetchPropertyReviews(req, res, next) {
+  try {
+    const propertyId = parseInt(req.params.id);
+
+    if (isNaN(propertyId)) {
+      return res.status(400).send({ msg: "Bad request." });
+    }
+
+    const { reviews, average_rating } = await getReviewsByPropertyId(propertyId);
+
+    if (!reviews || reviews.length === 0) {
+      return res.status(404).send({ msg: "Path not found." });
+    }
+
+    res.status(200).send({ reviews, average_rating });
+
+  } catch (err) {
+  console.error("Error in fetchPropertyReviews:", err);
+  next(err);
+ }
+}
+
+module.exports = { getProperties, fetchPropertyById, fetchPropertyReviews };
+
+
+
 
