@@ -31,7 +31,15 @@ This can also be tested on pqsl by connecting to the database and querying the d
 
 # Querying the data
 
-Created an app.js, app.test.js, model folder and controller folder to start querying the data and receiving status when completed or failed.
+Created an app.js, app.test.js, model folder and controller folder to start building the endpoints.
+
+Endpoints build and tested:
+
+GET 
+
+POST
+
+
 
 # Creating a dev dtb
 

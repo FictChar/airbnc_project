@@ -43,7 +43,54 @@ describe("app", () => {
      });  
   
   });
- });
+
+  describe("GET /api/properties with optional price filters", () => {
+
+  test("returns properties sort by property_id when no filters provided", async () => {
+    const { body, status } = await request(app).get("/api/properties");
+    expect(status).toBe(200);
+    expect(Array.isArray(body.properties)).toBe(true);
+  });
+
+  test("returns properties with price >= minprice", async () => {
+    const minPrice = 50;
+    const { body, status } = await request(app).get(`/api/properties?minprice=${minPrice}`);
+    expect(status).toBe(200);
+    body.properties.forEach(p => {
+      expect(p.price_per_night).toBeGreaterThanOrEqual(minPrice);
+    });
+  });
+
+  test("returns properties with price <= maxprice", async () => {
+    const maxPrice = 150;
+    const { body, status } = await request(app).get(`/api/properties?maxprice=${maxPrice}`);
+    expect(status).toBe(200);
+    body.properties.forEach(p => {
+      expect(p.price_per_night).toBeLessThanOrEqual(maxPrice);
+    });
+  });
+
+  test("returns properties within minprice and maxprice range", async () => {
+    const minPrice = 50;
+    const maxPrice = 150;
+    const { body, status } = await request(app).get(`/api/properties?minprice=${minPrice}&maxprice=${maxPrice}`);
+    expect(status).toBe(200);
+    body.properties.forEach(p => {
+      expect(p.price_per_night).toBeGreaterThanOrEqual(minPrice);
+      expect(p.price_per_night).toBeLessThanOrEqual(maxPrice);
+    });
+  });
+
+  test("returns empty array if no properties match filters", async () => {
+    const { body, status } = await request(app).get("/api/properties?minprice=999999");
+    expect(status).toBe(200);
+    expect(Array.isArray(body.properties)).toBe(true);
+    expect(body.properties.length).toBe(0);
+  });
+
+});
+
+});
 
 
 
@@ -145,7 +192,8 @@ describe("GET /api/properties/:id/reviews", () => {
      test("responds with 200 OK status", async () => {
         await request(app).get("/api/users/1").expect(200);
    });
-});
+  });
+
 
 describe("Error handling, GET /api/properties/", () => {
   test("respond with 400 bad request when path not found", async () => {
@@ -206,8 +254,8 @@ describe("Error handling, GET /api/users/:id", () => {
       expect(status).toBe(400);
       expect(body).toHaveProperty("msg", "Bad request.");
   
+    });
   });
-});
 
 
 });

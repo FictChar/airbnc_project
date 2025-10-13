@@ -1,8 +1,9 @@
 const propertiesData = require("../data/test/index");
 const db = require("../connection");
 
-async function getAllProperties() {
-  const query = await db.query(
+async function getAllProperties(filters = {}) {
+  const { minprice, maxprice } = filters;
+  let propertiesQuery = 
     ` SELECT 
       p.property_id,
       p.name AS property_name,
@@ -11,13 +12,33 @@ async function getAllProperties() {
       u.first_name || ' ' || u.surname AS host
     FROM properties p
     JOIN users u ON p.host_id = u.user_id
-    ORDER BY p.property_id;
-  `);
-  return query.rows;
+  `;
+  const conditions = [];
+  const values = [];
+
+if (minprice !== undefined && !isNaN(minprice)) {
+  values.push(Number(minprice));
+  conditions.push(`p.price_per_night >= $${values.length}`);
+}
+
+if (maxprice !== undefined && !isNaN(maxprice)) {
+  values.push(Number(maxprice));
+  conditions.push(`p.price_per_night <= $${values.length}`);
+}
+
+if (conditions.length > 0) {
+  propertiesQuery += ' WHERE ' + conditions.join(' AND ');
+}
+
+propertiesQuery += ' ORDER BY p.property_id;';
+
+
+const query = await db.query(propertiesQuery, values);
+return query.rows;
 }
 
 async function getPropertyById(propertyId) {
-  const query = 
+  const propertyByIdQuery = 
   `SELECT 
       p.property_id,
       p.name AS property_name,
@@ -30,7 +51,7 @@ async function getPropertyById(propertyId) {
       JOIN users u ON p.host_id = u.user_id
       WHERE p.property_id = $1
       `;
-  const { rows } = await db.query(query, [propertyId]);
+  const { rows } = await db.query(propertyByIdQuery, [propertyId]);
   return rows[0];
 }
 

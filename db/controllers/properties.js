@@ -2,7 +2,12 @@ const { getAllProperties, getPropertyById, getReviewsByPropertyId, getUsersById}
 
 async function getProperties(req, res, next) {
   try {
-    const properties = await getAllProperties();
+    const { minprice, maxprice } = req.query;
+    const filters = {};
+    if(minprice) filters.minprice = minprice;
+    if(maxprice) filters.maxprice = maxprice;
+
+    const properties = await getAllProperties(filters);
     res.status(200).send({ properties });
   } catch (err) {
     console.error(err);
