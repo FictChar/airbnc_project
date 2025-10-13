@@ -93,6 +93,8 @@ describe("GET /api/properties/:id", () => {
   });
 });
 
+
+
 describe("GET /api/properties/:id/reviews", () => {
   test("responds with 200 OK status", async () => {
     const propertyId = 1;
@@ -139,6 +141,11 @@ describe("GET /api/properties/:id/reviews", () => {
   });
 });
 
+  describe("GET /api/users/:id", () => {
+     test("responds with 200 OK status", async () => {
+        await request(app).get("/api/users/1").expect(200);
+   });
+});
 
 describe("Error handling, GET /api/properties/", () => {
   test("respond with 400 bad request when path not found", async () => {
@@ -182,4 +189,25 @@ describe("Error handling, GET /api/properties/:id/reviews", () => {
   
   });
 });
+
+
+describe("Error handling, GET /api/users/:id", () => {
+
+  test("responds with 404 not found on GET /api/users/:id if user is not available", async () => {
+    const userId= 99999;
+    const { body, status } = await request(app).get(`/api/users/${userId}`);
+      expect(status).toBe(404);
+      expect(body).toHaveProperty("msg", "Path not found.");
+  });
+
+  test("responds with 400 bad request on GET /api/users/:id if user_id is not a number", async () => {
+    const userId = "not-a-number";
+    const { body, status } = await request(app).get(`/api/users/${userId}`);
+      expect(status).toBe(400);
+      expect(body).toHaveProperty("msg", "Bad request.");
+  
+  });
+});
+
+
 });

@@ -1,4 +1,4 @@
-const { getAllProperties, getPropertyById, getReviewsByPropertyId } = require("../models/properties");
+const { getAllProperties, getPropertyById, getReviewsByPropertyId, getUsersById} = require("../models/properties");
 
 async function getProperties(req, res, next) {
   try {
@@ -52,7 +52,27 @@ async function fetchPropertyReviews(req, res, next) {
  }
 }
 
-module.exports = { getProperties, fetchPropertyById, fetchPropertyReviews };
+async function fetchUsersById(req,res,next) {
+  try {
+    const userId = parseInt(req.params.id);
+
+    if(isNaN(userId)) {
+      return res.status(400).send({ msg: "Bad request."});
+    }
+
+    const user = await getUsersById(userId);
+
+    if(!user) {
+      return res.status(404).send({ msg: "Path not found."})
+    }
+
+    res.status(200).send({ user });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { getProperties, fetchPropertyById, fetchPropertyReviews, fetchUsersById };
 
 
 
