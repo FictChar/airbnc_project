@@ -39,6 +39,8 @@ GET
 
 POST
 
+DELETE
+
 
 
 # Creating a dev dtb

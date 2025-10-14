@@ -7,9 +7,9 @@
     "test-utils": "jest utils",
     "test": "jest app",
     "setup-dbs": "psql -f ./db/setup.sql",
-    "seed-test": "NODE_ENV=test node ./db/data/seed_run.js",
-    "seed-dev": "NODE_ENV=development node ./db/data/seed_run.js",
-    "seed-prod":"NODE_ENV=production node .db/data/seed_run.js",
+    "seed-test": "NODE_ENV=test node ./db/run_seed.js",
+    "seed-dev": "NODE_ENV=development node ./db/run_seed.js",
+    "seed-prod":"NODE_ENV=production node ./db/run_seed.js",
     "dev": "nodemon listen.js"
   },
   "repository": {

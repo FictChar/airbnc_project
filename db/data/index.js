@@ -1,7 +1,7 @@
 const ENV = process.env.NODE_ENV;
 
-const devData = require("./dev");
-const testData = require("./test");
+const devData = require("./dev/index");
+const testData = require("./test/index");
 
 const data = {
     test: testData,
