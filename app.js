@@ -13,7 +13,7 @@ app.get("/api/users/:id", fetchUsersById);
 
 
 app.use((req, res) => {
-    res.status(400).send({ msg : "Bad request."});
+    res.status(404).send({ msg : "Not found."});
 });
 
 app.use((err, req, res, next) => {

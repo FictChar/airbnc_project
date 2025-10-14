@@ -2,12 +2,12 @@ const request = require ("supertest");
 const app = require("../../../app");
 const db = require("../../connection");
 
-beforeAll(async () => {
-  const { body } = await request(app).get("/api/properties");
-  testProperty = body.properties[0]; 
-});
+// beforeAll(async () => {
+//   const { body } = await request(app).get("/api/properties");
+//   testProperty = body.properties[0]; 
+// });
 
-afterAll(() => db.end ());
+// afterAll(() => db.end ());
 
 describe("app", () => {
 
@@ -196,10 +196,10 @@ describe("GET /api/properties/:id/reviews", () => {
 
 
 describe("Error handling, GET /api/properties/", () => {
-  test("respond with 400 bad request when path not found", async () => {
+  test("respond with 404 bad request when path not found", async () => {
     const response = await request(app).get("/api/notfound");
-    expect(response.status).toBe(400);
-    expect(response.body.msg).toBe("Bad request.");
+    expect(response.status).toBe(404);
+    expect(response.body.msg).toBe("Not found.");
   });
 });
 
