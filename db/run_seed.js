@@ -5,9 +5,9 @@ const { propertyTypesData, usersData, propertiesData, reviewsData, imagesData } 
 seed(propertyTypesData, usersData, propertiesData, reviewsData, imagesData)
 .then(() => {
     console.log("Data seeding complete!");
-    db.end();
+    return db.end();
 })
 .catch((err) => {
     console.error("Error found during data seeding:", err);
-    db.end();
+    return db.end();
 });

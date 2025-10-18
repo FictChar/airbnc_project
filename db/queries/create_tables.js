@@ -10,7 +10,7 @@ async function createTables () {
         user_id SERIAL PRIMARY KEY,
         first_name VARCHAR NOT NULL,
         surname VARCHAR NOT NULL,
-        email VARCHAR NOT NULL,
+        email VARCHAR NOT NULL UNIQUE,
         phone_number VARCHAR NOT NULL,
         is_host BOOL NOT NULL,
         avatar VARCHAR,
@@ -23,7 +23,7 @@ async function createTables () {
         name VARCHAR(100) NOT NULL,
         location VARCHAR NOT NULL,
         property_type VARCHAR(50) NOT NULL,
-        price_per_night DECIMAL NOT NULL,
+        price_per_night DECIMAL NOT NULL CHECK (price_per_night >=0) ,
         description TEXT);`);
 
     

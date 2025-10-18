@@ -1,4 +1,3 @@
-const propertiesData = require("../data/test/index");
 const db = require("../connection");
 
 async function getAllProperties(filters = {}) {
@@ -14,16 +13,16 @@ async function getAllProperties(filters = {}) {
     JOIN users u ON p.host_id = u.user_id
   `;
   const conditions = [];
-  const values = [];
+  const queryParameters = [];
 
 if (minprice !== undefined && !isNaN(minprice)) {
-  values.push(Number(minprice));
-  conditions.push(`p.price_per_night >= $${values.length}`);
+  queryParameters.push(Number(minprice));
+  conditions.push(`p.price_per_night >= $${queryParameters.length}`);
 }
 
 if (maxprice !== undefined && !isNaN(maxprice)) {
-  values.push(Number(maxprice));
-  conditions.push(`p.price_per_night <= $${values.length}`);
+  queryParameters.push(Number(maxprice));
+  conditions.push(`p.price_per_night <= $${queryParameters.length}`);
 }
 
 if (conditions.length > 0) {
@@ -33,7 +32,7 @@ if (conditions.length > 0) {
 propertiesQuery += ' ORDER BY p.property_id;';
 
 
-const query = await db.query(propertiesQuery, values);
+const query = await db.query(propertiesQuery, queryParameters);
 return query.rows;
 }
 
@@ -70,14 +69,14 @@ async function getReviewsByPropertyId(propertyId) {
      ORDER BY r.created_at DESC;
      `;
 
-  const averageReviewsRating = 
+  const averageReviewsRatingQuery = 
   `SELECT ROUND (AVG(rating)::numeric) AS average_rating
    FROM reviews
    WHERE property_id = $1;
    `;
 
    const reviewsResult = await db.query(reviewsQuery, [propertyId]);
-   const averageRatingResult = await db.query(averageReviewsRating, [propertyId]);
+   const averageRatingResult = await db.query(averageReviewsRatingQuery, [propertyId]);
 
   return { 
     reviews : reviewsResult.rows, 
