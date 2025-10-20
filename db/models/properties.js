@@ -105,5 +105,48 @@ async function getUsersById(userId){
 }
 
 
+async function createNewReview(propertyId, { guest_id, rating, comment }) {
+ 
+  const propertyCheck = await db.query(
+    `SELECT 1 FROM properties WHERE property_id = $1`,
+    [propertyId]
+  );
 
-module.exports = { getAllProperties, getPropertyById, getReviewsByPropertyId, getUsersById };
+  if (propertyCheck.rows.length === 0) {
+    const err = new Error("Property not found.");
+    err.status = 404;
+    throw err;
+  }
+
+  const guestCheck = await db.query(
+    `SELECT 1 FROM users WHERE user_id = $1`,
+    [guest_id]
+  );
+
+  if (guestCheck.rows.length === 0) {
+    const err = new Error("Guest not found.");
+    err.status = 404;
+    throw err;
+  }
+
+  const insertQuery = `
+    INSERT INTO reviews (property_id, guest_id, rating, comment)
+    VALUES ($1, $2, $3, $4)
+    RETURNING review_id, property_id, guest_id, rating, comment, created_at
+  `;
+  const values = [propertyId, guest_id, rating, comment];
+
+  const { rows } = await db.query(insertQuery, values);
+
+  return { review: rows[0] };
+}
+
+
+
+module.exports = { 
+  getAllProperties, 
+  getPropertyById, 
+  getReviewsByPropertyId, 
+  getUsersById, 
+  createNewReview
+};

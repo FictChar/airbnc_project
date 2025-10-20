@@ -1,11 +1,22 @@
 const express = require("express");
 const app = express ();
-const { getProperties, fetchPropertyById, fetchPropertyReviews, fetchUsersById } = require("./db/controllers/properties");
+const { 
+    getProperties, 
+    fetchPropertyById, 
+    fetchPropertyReviews, 
+    fetchUsersById,
+    addReviewToProperty, 
+} = require("./db/controllers/properties");
+
+app.use(express.json());
+
 
 app.get("/api/properties", getProperties);
 app.get("/api/properties/:id", fetchPropertyById);
 app.get("/api/properties/:id/reviews", fetchPropertyReviews);
 app.get("/api/users/:id", fetchUsersById);
+app.post("/api/properties/:id/reviews", addReviewToProperty);
+
 
 
 app.use((req, res) => {

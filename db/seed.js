@@ -2,10 +2,21 @@ const db = require("./connection.js");
 const format = require("pg-format");
 const dropTables = require("./queries/drop_tables.js")
 const createTables = require("./queries/create_tables.js")
-const { usersData, propertiesData, reviewsData, imagesData } = require("./data/test/index.js")
-const { formatProperties, propertiesLookUp, formatReviews, createPropertyIdRef, formattedImages} = require("./data/utils/utils.js")
+const { 
+  usersData, 
+  propertiesData, 
+  reviewsData, 
+  imagesData 
+} = require("./data/test/index.js")
+const { 
+  formatProperties, 
+  propertiesLookUp, 
+  formatReviews, 
+  createPropertyIdRef, 
+  formattedImages
+} = require("./data/utils/utils.js")
 
-async function seed (propertyTypesData, usersData, propertiesData, reviewsData) {
+async function seed (propertyTypesData, usersData, propertiesData, reviewsData, imagesData) {
 
     await dropTables();
     await createTables();

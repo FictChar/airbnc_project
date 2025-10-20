@@ -193,6 +193,17 @@ describe("app", () => {
       await request(app).get("/api/users/1").expect(200);
     });
 
+  describe("POST /api/properties/:id/reviews - sad paths", () => {
+
+  test("400 if guest_id is missing", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ rating: 5, comment: "Nice" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toMatch(/guest_id is missing/i);
+  });
+
   });
 
   describe("Error handling for invalid paths and queries", () => {
@@ -264,5 +275,92 @@ describe("app", () => {
     });
 
   });
+
+});
+
+describe("POST /api/properties/:id/reviews sad paths", () => {
+
+  test("400 if guest_id is missing", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ rating: 5, comment: "Nice" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toMatch(/guest_id is missing/i);
+  });
+
+  test("400 if guest_id is not a number", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ guest_id: "abc", rating: 5, comment: "Nice" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toMatch(/guest_id.*not a number/i);
+  });
+
+  test("400 if rating is missing", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ guest_id: 1, comment: "Nice" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toMatch(/rating is missing/i);
+  });
+
+  test("400 if rating is not a number", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ guest_id: 1, rating: "bad", comment: "Nice" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toMatch(/rating.*not a number/i);
+  });
+
+  test("400 if rating is out of range (<1)", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ guest_id: 1, rating: 0, comment: "Testing rating under 1" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toBe("Bad request, rating must be between 1 and 5.");
+  });
+
+  test("400 if rating is out of range (>5)", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ guest_id: 1, rating: 9, comment: "Testing rating over 5" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toBe("Bad request, rating must be between 1 and 5.");
+  });
+
+  test("404 if property_id does not exist", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/99999/reviews")
+      .send({ guest_id: 1, rating: 5, comment: "Non-existent property" });
+
+    expect(status).toBe(404);
+    expect(body.msg).toMatch(/property not found/i);
+  });
+
+  test("404 if guest_id does not exist", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send({ guest_id: 99999, rating: 5, comment: "Non-existent guest" });
+
+    expect(status).toBe(404);
+    expect(body.msg).toMatch(/guest not found/i);
+  });
+
+  test("400 if property_id is not a number", async () => {
+    const { body, status } = await request(app)
+      .post("/api/properties/not-a-number/reviews")
+      .send({ guest_id: 1, rating: 5, comment: "Bad property id" });
+
+    expect(status).toBe(400);
+    expect(body.msg).toMatch(/property id is not a number/i);
+  });
+
+});
 
 });
