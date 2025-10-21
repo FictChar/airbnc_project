@@ -3,10 +3,15 @@ const app = express ();
 const { 
     getProperties, 
     fetchPropertyById, 
-    fetchPropertyReviews, 
-    fetchUsersById,
-    addReviewToProperty, 
 } = require("./db/controllers/properties");
+const { 
+    fetchPropertyReviews, 
+    addReviewToProperty,
+    removeReview, 
+} = require("./db/controllers/reviews");
+const {  
+    fetchUsersById,
+} = require("./db/controllers/users");
 
 app.use(express.json());
 
@@ -15,8 +20,10 @@ app.get("/api/properties", getProperties);
 app.get("/api/properties/:id", fetchPropertyById);
 app.get("/api/properties/:id/reviews", fetchPropertyReviews);
 app.get("/api/users/:id", fetchUsersById);
+
 app.post("/api/properties/:id/reviews", addReviewToProperty);
 
+app.delete("/api/reviews/:id", removeReview);
 
 
 app.use((req, res) => {

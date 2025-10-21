@@ -192,8 +192,9 @@ describe("app", () => {
     test("responds with 200 OK status for valid user_id", async () => {
       await request(app).get("/api/users/1").expect(200);
     });
+  });
 
-  describe("POST /api/properties/:id/reviews - sad paths", () => {
+  describe("POST /api/properties/:id/reviews error handling", () => {
 
   test("400 if guest_id is missing", async () => {
     const { body, status } = await request(app)
@@ -203,10 +204,37 @@ describe("app", () => {
     expect(status).toBe(400);
     expect(body.msg).toMatch(/guest_id is missing/i);
   });
+  
+});
+
+});
+
+  describe("DELETE review from /api/reviews/:id", () => {
+  let reviewId;
+
+  beforeAll(async () => {
+    const newReview = {
+      guest_id: 1,
+      rating: 5,
+      comment: "Review to be deleted"
+    };
+
+    const { body } = await request(app)
+      .post("/api/properties/1/reviews")
+      .send(newReview);
+
+    reviewId = body.review.review_id; 
+  });
+
+test("responds with 204 when successfully deletes an existing review", async () => {
+  await request(app)
+    .delete(`/api/reviews/${reviewId}`)
+    .expect(204);
+});
 
   });
 
-  describe("Error handling for invalid paths and queries", () => {
+  describe("GET requests error handling for invalid paths and queries", () => {
 
     test("responds 404 Not found for unknown path", async () => {
       const { body, status } = await request(app).get("/api/notfound");
@@ -276,9 +304,7 @@ describe("app", () => {
 
   });
 
-});
-
-describe("POST /api/properties/:id/reviews sad paths", () => {
+describe("POST /api/properties/:id/reviews error handling", () => {
 
   test("400 if guest_id is missing", async () => {
     const { body, status } = await request(app)
@@ -363,4 +389,24 @@ describe("POST /api/properties/:id/reviews sad paths", () => {
 
 });
 
+
+
+  describe("DELETE review from /api/reviews/:id error handling", () => {
+
+
+  test("responds with 404 when the review is not found", async () => {
+    const { body, status } = await request(app)
+      .delete("/api/reviews/99999");
+
+    expect(status).toBe(404);
+    expect(body.msg).toBe("Review not found.");
+  });
+
+  test("400: invalid review id (not a number)", async () => {
+    const { body, status } = await request(app)
+      .delete("/api/reviews/not-a-number");
+
+    expect(status).toBe(400);
+    expect(body.msg).toBe("Bad request, review id is not a number.");
+  });
 });

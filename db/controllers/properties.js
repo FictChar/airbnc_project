@@ -3,7 +3,8 @@ const {
   getPropertyById, 
   getReviewsByPropertyId, 
   getUsersById,
-  createNewReview
+  createNewReview,
+  deleteReview
 } = require("../models/properties");
 
 
@@ -142,8 +143,5 @@ async function addReviewToProperty(req, res, next) {
 module.exports = { 
   getProperties, 
   fetchPropertyById, 
-  fetchPropertyReviews, 
-  fetchUsersById,
-  addReviewToProperty
 };
 

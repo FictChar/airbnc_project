@@ -141,12 +141,31 @@ async function createNewReview(propertyId, { guest_id, rating, comment }) {
   return { review: rows[0] };
 }
 
+async function deleteReview(reviewId) {
+
+  const { rows } = await db.query(
+    `SELECT 1 FROM reviews WHERE review_id = $1`,
+    [reviewId]
+  );
+
+  if (rows.length === 0) {
+    const err = new Error("Review not found.");
+    err.status = 404; // will be used by the controller
+    throw err;
+  }
+
+  await db.query(
+    `DELETE FROM reviews WHERE review_id = $1`,
+    [reviewId]
+  );
+
+  return;
+}
+
+
 
 
 module.exports = { 
   getAllProperties, 
   getPropertyById, 
-  getReviewsByPropertyId, 
-  getUsersById, 
-  createNewReview
 };
