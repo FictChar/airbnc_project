@@ -63,8 +63,9 @@ describe("app", () => {
         expect(typeof property.host).toBe("string");
       });
     });
+  });
 
-    describe("responds 200 when using optional price filters", () => {
+    describe("GET /api/properties responds 200 when using optional price filters", () => {
 
       test("returns properties sorted by property_id when no filters provided", async () => {
         const { body, status } = await request(app).get("/api/properties");
@@ -102,9 +103,7 @@ describe("app", () => {
         expect(Array.isArray(body.properties)).toBe(true);
         expect(body.properties.length).toBe(0);
       });
-
     });
-
   });
 
   describe("GET /api/properties/:id", () => {
@@ -141,7 +140,6 @@ describe("app", () => {
       expect(typeof property.host).toBe("string");
       expect(typeof property.host_avatar).toBe("string");
     });
-
   });
 
   describe("GET /api/properties/:id/reviews", () => {
@@ -184,7 +182,6 @@ describe("app", () => {
       expect(status).toBe(200);
       expect(typeof body.average_rating).toBe("number");
     });
-
   });
 
   describe("GET /api/users/:id", () => {
@@ -204,9 +201,6 @@ describe("app", () => {
     expect(status).toBe(400);
     expect(body.msg).toMatch(/guest_id is missing/i);
   });
-  
-});
-
 });
 
   describe("DELETE review from /api/reviews/:id", () => {
@@ -388,7 +382,6 @@ describe("POST /api/properties/:id/reviews error handling", () => {
   });
 
 });
-
 
 
   describe("DELETE review from /api/reviews/:id error handling", () => {

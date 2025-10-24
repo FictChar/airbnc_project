@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The AIRBNC API</title>
+
+  <style>
+   
+    body {
+      font-family: Montserrat, EB Garamond;
+      margin: 20px;
+      background: #6B5941;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px #436C6E(0,0,0,0.1);
+    }
+
+    h1 {
+      text-align: center;
+      -webkit-text-fill-color: #D59C82;
+    }
+
+    .endpoint-block {
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #436C6E;
+    }
+
+    input, button, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .button {
+      cursor: pointer;
+    }
+
+    .response {
+      background: #436C6E;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>Welcome to the AIRBNC API</h1>
+
+    <div class="endpoint-block">
+      <h2>Test the available endpoints</h2>
+      <label for="exampleInput">/api/properties/</label>
+      <input type="text" id="parameterInput" placeholder="Enter parameter" />
+
+      <button id="requestButton">Send Request</button>
+
+      <h3>Response:</h3>
+      <div id="response" class="response"></div>
+    </div>
+</body>
+</html>

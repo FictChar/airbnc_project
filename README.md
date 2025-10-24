@@ -37,9 +37,9 @@ Endpoints build and tested:
 
 GET 
 
-POST
+POST post new review into the review table
 
-DELETE
+DELETE review using review_id
 
 
 
