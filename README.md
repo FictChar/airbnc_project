@@ -2,6 +2,11 @@
 
 An API for a property rental service. It includes functionality for managing users, properties, property types, reviews, and other related data.
 
+# Project link
+
+https://airbnc-project.onrender.com
+
+
 # Dependencies
 
 Initialise the project and install the required modules:
@@ -55,12 +60,6 @@ DELETE:
 Add new dev database to the setup.sql file
 
 npm run create-dbs to test
-
-
-# Supabase project link
-
-https://hzewqnwexfppcgoywqip.supabase.co
-
 
 
 
