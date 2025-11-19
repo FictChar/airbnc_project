@@ -9,7 +9,7 @@
     "setup-dbs": "psql -f ./db/setup.sql",
     "seed-test": "NODE_ENV=test node ./db/run_seed.js",
     "seed-dev": "NODE_ENV=development node ./db/run_seed.js",
-    "seed-prod":"NODE_ENV=production node ./db/run_seed.js",
+    "seed-prod": "NODE_ENV=production node ./db/run_seed.js",
     "dev": "nodemon listen.js"
   },
   "repository": {
@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/FictChar/airbnc_project#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "jest": "^30.1.3",
