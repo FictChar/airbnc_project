@@ -30,13 +30,13 @@ describe("app", () => {
       await request(app).get("/api/properties").expect(200);
     });
 
-    test("responds with an array of property objects", async () => {
+    test("responds with 200 when responds with an array of property objects", async () => {
       const { body, status } = await request(app).get("/api/properties");
       expect(status).toBe(200);
       expect(Array.isArray(body.properties)).toBe(true);
     });
 
-    test("each property object has the correct keys", async () => {
+    test("responds with 200 if each property object has the correct keys", async () => {
       const { body, status } = await request(app).get("/api/properties");
       expect(status).toBe(200);
       body.properties.forEach(property => {
@@ -52,7 +52,7 @@ describe("app", () => {
       });
     });
 
-    test("each property value has the correct type", async () => {
+    test("responds with 200 if each property value has the correct type", async () => {
       const { body, status } = await request(app).get("/api/properties");
       expect(status).toBe(200);
       body.properties.forEach(property => {
@@ -67,27 +67,27 @@ describe("app", () => {
 
     describe("GET /api/properties responds 200 when using optional price filters", () => {
 
-      test("returns properties sorted by property_id when no filters provided", async () => {
+      test("responds with 200 if returns properties sorted by property_id when no filters provided", async () => {
         const { body, status } = await request(app).get("/api/properties");
         expect(status).toBe(200);
         expect(Array.isArray(body.properties)).toBe(true);
       });
 
-      test("returns properties with price >= minprice", async () => {
+      test("responds with 200 if returns properties with price >= minprice", async () => {
         const minPrice = 50;
         const { body, status } = await request(app).get(`/api/properties?minprice=${minPrice}`);
         expect(status).toBe(200);
         body.properties.forEach(p => expect(p.price_per_night).toBeGreaterThanOrEqual(minPrice));
       });
 
-      test("returns properties with price <= maxprice", async () => {
+      test("responds with 200 if returns properties with price <= maxprice", async () => {
         const maxPrice = 150;
         const { body, status } = await request(app).get(`/api/properties?maxprice=${maxPrice}`);
         expect(status).toBe(200);
         body.properties.forEach(p => expect(p.price_per_night).toBeLessThanOrEqual(maxPrice));
       });
 
-      test("returns properties within minprice and maxprice range", async () => {
+      test("responds with 200 if returns properties within minprice and maxprice range", async () => {
         const minPrice = 50, maxPrice = 150;
         const { body, status } = await request(app).get(`/api/properties?minprice=${minPrice}&maxprice=${maxPrice}`);
         expect(status).toBe(200);
@@ -97,7 +97,7 @@ describe("app", () => {
         });
       });
 
-      test("returns empty array if no properties match filters", async () => {
+      test("responds with 200 if returns empty array if no properties match filters", async () => {
         const { body, status } = await request(app).get("/api/properties?minprice=999999");
         expect(status).toBe(200);
         expect(Array.isArray(body.properties)).toBe(true);
@@ -112,7 +112,7 @@ describe("app", () => {
       await request(app).get("/api/properties/1").expect(200);
     });
 
-    test("responds with a property object containing correct keys", async () => {
+    test("responds with 200 if returns a property object containing correct keys", async () => {
       const { body, status } = await request(app).get("/api/properties/1");
       expect(status).toBe(200);
       const property = body.property;
@@ -128,7 +128,7 @@ describe("app", () => {
       ]));
     });
 
-    test("each property value has the expected type", async () => {
+    test("responds with 200 if each property value has the expected type", async () => {
       const { body, status } = await request(app).get("/api/properties/1");
       expect(status).toBe(200);
       const property = body.property;
@@ -149,14 +149,14 @@ describe("app", () => {
       expect(status).toBe(200);
     });
 
-    test("responds with an array of reviews", async () => {
+    test("responds with 200 if receives an array of reviews", async () => {
       const { body, status } = await request(app).get("/api/properties/1/reviews");
       expect(status).toBe(200);
       expect(Array.isArray(body.reviews)).toBe(true);
       expect(body.reviews.length).toBeGreaterThanOrEqual(1);
     });
 
-    test("each review has correct keys and types", async () => {
+    test("responds with 200 if each review has correct keys and types", async () => {
       const { body, status } = await request(app).get("/api/properties/1/reviews");
       expect(status).toBe(200);
       body.reviews.forEach(review => {
@@ -177,14 +177,98 @@ describe("app", () => {
       });
     });
 
-    test("responds with average_rating as a number", async () => {
+    test("responds with 200 if average_rating as a number", async () => {
       const { body, status } = await request(app).get("/api/properties/1/reviews");
       expect(status).toBe(200);
       expect(typeof body.average_rating).toBe("number");
     });
   });
 
-  describe("GET /api/users/:id", () => {
+  describe("GET /api/properties?maxprice=100", () => {
+  test("responds with 200 if returns only properties <= max price", async () => {
+    const res = await request(app)
+      .get("/api/properties?maxprice=100")
+      .expect(200);
+
+    res.body.properties.forEach(property => {
+      expect(property.price_per_night).toBeLessThanOrEqual(100);
+    });
+  });
+});
+
+test("responds with 200 if sorts by price ascending", async () => {
+  const res = await request(app)
+    .get("/api/properties?sort_by=price&order=asc")
+    .expect(200);
+
+  const prices = res.body.properties.map(p => p.price_per_night);
+
+  for (let i = 1; i < prices.length; i++) {
+    expect(prices[i]).toBeGreaterThanOrEqual(prices[i - 1]);
+  }
+});
+
+test("responds with 200 if sorts by price descending", async () => {
+  const res = await request(app)
+    .get("/api/properties?sort_by=price&order=desc")
+    .expect(200);
+
+  const prices = res.body.properties.map(p => p.price_per_night);
+
+  for (let i = 1; i < prices.length; i++) {
+    expect(prices[i]).toBeLessThanOrEqual(prices[i - 1]);
+  }
+});
+
+test("responds with 400 when invalid sort_by", async () => {
+  const res = await request(app)
+    .get("/api/properties?sort_by=cheese")
+    .expect(400);
+
+  expect(res.body.msg).toBe("Invalid sort_by field");
+});
+
+test("responds with 400  when minprice higher than maxprice", async () => {
+  const res = await request(app)
+    .get("/api/properties?minprice=200&maxprice=100")
+    .expect(400);
+
+  expect(res.body.msg).toBe("Bad request, minimum price higher than maximum price.");
+});
+
+test("responds with 400 if minprice negative", async () => {
+  const res = await request(app)
+    .get("/api/properties?minprice=-10")
+    .expect(400);
+
+  expect(res.body.msg).toBe("Bad request, the minimum price provided is a negative number.");
+});
+
+test("responds with 400 if maxprice not a number", async () => {
+  const res = await request(app)
+    .get("/api/properties?maxprice=abc")
+    .expect(400);
+
+  expect(res.body.msg).toBe("Bad request, maximum price is not a number.");
+});
+
+test("responds with 400 if invalid sort_by", async () => {
+  const res = await request(app)
+    .get("/api/properties?sort_by=bananas")
+    .expect(400);
+
+  expect(res.body.msg).toBe("Invalid sort_by field");
+});
+
+test("responds with 400 if invalid order", async () => {
+  const res = await request(app)
+    .get("/api/properties?order=sideways")
+    .expect(400);
+
+  expect(res.body.msg).toBe("Invalid order");
+});
+
+describe("GET /api/users/:id", () => {
 
     test("responds with 200 OK status for valid user_id", async () => {
       await request(app).get("/api/users/1").expect(200);
@@ -193,7 +277,7 @@ describe("app", () => {
 
   describe("POST /api/properties/:id/reviews error handling", () => {
 
-  test("400 if guest_id is missing", async () => {
+  test("responds with 400 if guest_id is missing", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ rating: 5, comment: "Nice" });
@@ -230,25 +314,25 @@ test("responds with 204 when successfully deletes an existing review", async () 
 
   describe("GET requests error handling for invalid paths and queries", () => {
 
-    test("responds 404 Not found for unknown path", async () => {
+    test("responds with 404 Not found for unknown path", async () => {
       const { body, status } = await request(app).get("/api/notfound");
       expect(status).toBe(404);
       expect(body.msg).toBe("Path not found.");
     });
 
-    test("responds 400 if minprice is not a number", async () => {
+    test("responds with 400 if minprice is not a number", async () => {
       const { body, status } = await request(app).get("/api/properties?minprice=abc");
       expect(status).toBe(400);
       expect(body.msg).toBe("Bad request, minimum price is not a number.");
     });
 
-    test("responds 400 if maxprice is not a number", async () => {
+    test("responds with 400 if maxprice is not a number", async () => {
       const { body, status } = await request(app).get("/api/properties?maxprice=xyz");
       expect(status).toBe(400);
       expect(body.msg).toBe("Bad request, maximum price is not a number.");
     });
 
-    test("responds 400 if minprice is negative", async () => {
+    test("responds with 400 if minprice is negative", async () => {
       const { body, status } = await request(app).get("/api/properties?minprice=-10");
       expect(status).toBe(400);
       expect(body.msg).toBe("Bad request, the minimum price provided is a negative number.");
@@ -260,19 +344,19 @@ test("responds with 204 when successfully deletes an existing review", async () 
       expect(body.msg).toBe("Bad request, minimum price higher than maximum price.");
     });
 
-    test("responds 404 if property_id not found", async () => {
+    test("responds with 404 if property_id not found", async () => {
       const { body, status } = await request(app).get("/api/properties/99999");
       expect(status).toBe(404);
       expect(body.msg).toBe("Property not found.");
     });
 
-    test("responds 400 if property_id is not a number", async () => {
+    test("responds with 400 if property_id is not a number", async () => {
       const { body, status } = await request(app).get("/api/properties/notanumber");
       expect(status).toBe(400);
       expect(body.msg).toBe("Bad request, property id is not a number.");
     });
 
-    test("responds 404 if reviews not found for existing property", async () => {
+    test("responds with 404 if reviews not found for existing property", async () => {
       const { body, status } = await request(app).get("/api/properties/99999/reviews");
       expect(status).toBe(404);
       expect(body.msg).toBe("Review not found.");
@@ -284,13 +368,13 @@ test("responds with 204 when successfully deletes an existing review", async () 
       expect(body.msg).toBe("Bad request, reviews property id is not a number.");
     });
 
-    test("responds 404 if user not found", async () => {
+    test("responds with 404 if user not found", async () => {
       const { body, status } = await request(app).get("/api/users/99999");
       expect(status).toBe(404);
       expect(body.msg).toBe("User not found.");
     });
 
-    test("responds 400 if user_id is not a number", async () => {
+    test("responds with 400 if user_id is not a number", async () => {
       const { body, status } = await request(app).get("/api/users/not-a-number");
       expect(status).toBe(400);
       expect(body.msg).toBe("Bad request, user id is not a number.");
@@ -300,7 +384,7 @@ test("responds with 204 when successfully deletes an existing review", async () 
 
 describe("POST /api/properties/:id/reviews error handling", () => {
 
-  test("400 if guest_id is missing", async () => {
+  test("responds with 400 if guest_id is missing", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ rating: 5, comment: "Nice" });
@@ -309,7 +393,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toMatch(/guest_id is missing/i);
   });
 
-  test("400 if guest_id is not a number", async () => {
+  test("responds with 400 if guest_id is not a number", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ guest_id: "abc", rating: 5, comment: "Nice" });
@@ -318,7 +402,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toMatch(/guest_id.*not a number/i);
   });
 
-  test("400 if rating is missing", async () => {
+  test("responds with 400 if rating is missing", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ guest_id: 1, comment: "Nice" });
@@ -327,7 +411,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toMatch(/rating is missing/i);
   });
 
-  test("400 if rating is not a number", async () => {
+  test("responds with 400 if rating is not a number", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ guest_id: 1, rating: "bad", comment: "Nice" });
@@ -336,7 +420,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toMatch(/rating.*not a number/i);
   });
 
-  test("400 if rating is out of range (<1)", async () => {
+  test("responds with 400 if rating is out of range (<1)", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ guest_id: 1, rating: 0, comment: "Testing rating under 1" });
@@ -345,7 +429,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toBe("Bad request, rating must be between 1 and 5.");
   });
 
-  test("400 if rating is out of range (>5)", async () => {
+  test("responds with 400 if rating is out of range (>5)", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ guest_id: 1, rating: 9, comment: "Testing rating over 5" });
@@ -354,7 +438,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toBe("Bad request, rating must be between 1 and 5.");
   });
 
-  test("404 if property_id does not exist", async () => {
+  test("responds with 404 if property_id does not exist", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/99999/reviews")
       .send({ guest_id: 1, rating: 5, comment: "Non-existent property" });
@@ -363,7 +447,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toMatch(/property not found/i);
   });
 
-  test("404 if guest_id does not exist", async () => {
+  test("responds with 404 if guest_id does not exist", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/1/reviews")
       .send({ guest_id: 99999, rating: 5, comment: "Non-existent guest" });
@@ -372,7 +456,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toMatch(/guest not found/i);
   });
 
-  test("400 if property_id is not a number", async () => {
+  test("responds with 400 if property_id is not a number", async () => {
     const { body, status } = await request(app)
       .post("/api/properties/not-a-number/reviews")
       .send({ guest_id: 1, rating: 5, comment: "Bad property id" });
@@ -395,7 +479,7 @@ describe("POST /api/properties/:id/reviews error handling", () => {
     expect(body.msg).toBe("Review not found.");
   });
 
-  test("400: invalid review id (not a number)", async () => {
+  test("responds with 400 if review id is not a number", async () => {
     const { body, status } = await request(app)
       .delete("/api/reviews/not-a-number");
 

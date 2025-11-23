@@ -1,7 +1,7 @@
 const db = require("../connection");
 
 async function getAllProperties(filters = {}) {
-  const { minprice, maxprice } = filters;
+  const { minprice, maxprice, sort_by = "price", order = "asc" } = filters;
   let propertiesQuery = 
     ` SELECT 
       p.property_id,
@@ -29,7 +29,15 @@ if (conditions.length > 0) {
   propertiesQuery += ' WHERE ' + conditions.join(' AND ');
 }
 
-propertiesQuery += ' ORDER BY p.property_id;';
+const sortMap = {
+  price: "p.price_per_night",
+  property_id: "p.property_id"
+};
+
+const orderColumn = sortMap[sort_by] || "p.price_per_night";
+const sortOrder = order.toUpperCase() === "DESC" ? "DESC" : "ASC";
+
+propertiesQuery += ` ORDER BY ${orderColumn} ${sortOrder};`;
 
 
 const query = await db.query(propertiesQuery, queryParameters);
@@ -168,4 +176,8 @@ async function deleteReview(reviewId) {
 module.exports = { 
   getAllProperties, 
   getPropertyById, 
+  getReviewsByPropertyId,
+  getUsersById,
+  createNewReview,
+  deleteReview,
 };
