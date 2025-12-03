@@ -16,6 +16,7 @@ npm install pg pg-format dotenv jest
 
 Dependencies used:
 
+Node
 pg – PostgreSQL client for Node.js
 pg-format – safely formats SQL queries
 dotenv – loads environment variables

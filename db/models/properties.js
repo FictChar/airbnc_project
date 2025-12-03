@@ -3,17 +3,22 @@ const db = require("../connection");
 async function getAllProperties(filters = {}) {
   const { minprice, maxprice, sort_by = "price", order = "asc" } = filters;
   let propertiesQuery = 
-    ` SELECT 
+    `SELECT
       p.property_id,
       p.property_type,
       p.name AS property_name,
       p.location,
       p.price_per_night::float AS price_per_night,
       u.first_name || ' ' || u.surname AS host,
-      i.image_url AS property_image
+      (
+        SELECT i.image_url
+        FROM images i
+        WHERE i.property_id = p.property_id
+        ORDER BY i.image_id ASC
+        LIMIT 1
+      ) AS property_image
     FROM properties p
     JOIN users u ON p.host_id = u.user_id
-    LEFT JOIN images i ON i.property_id = p.property_id
   `;
   const conditions = [];
   const queryParameters = [];
@@ -57,6 +62,13 @@ async function getPropertyById(propertyId) {
       p.description,
       (u.first_name || ' ' || u.surname) AS host,
       u.avatar AS host_avatar
+       (
+        SELECT i.image_url
+        FROM images i
+        WHERE i.property_id = p.property_id
+        ORDER BY i.image_id ASC
+        LIMIT 1
+      ) AS property_image  
       FROM properties p
       JOIN users u ON p.host_id = u.user_id
       WHERE p.property_id = $1
@@ -64,6 +76,13 @@ async function getPropertyById(propertyId) {
   const { rows } = await db.query(propertyByIdQuery, [propertyId]);
   return rows[0];
 }
+
+     // If we add more images in the future, use: (
+      //   SELECT json_agg(i.image_url)
+      //   FROM images i
+      //   WHERE i.property_id = p.property_id
+      //   ORDER BY i.image_id ASC
+      // ) AS property_images
 
 async function getReviewsByPropertyId(propertyId) {
   const reviewsQuery = 
