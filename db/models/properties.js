@@ -5,12 +5,15 @@ async function getAllProperties(filters = {}) {
   let propertiesQuery = 
     ` SELECT 
       p.property_id,
+      p.property_type,
       p.name AS property_name,
       p.location,
       p.price_per_night::float AS price_per_night,
-      u.first_name || ' ' || u.surname AS host
+      u.first_name || ' ' || u.surname AS host,
+      i.image_url AS property_image
     FROM properties p
     JOIN users u ON p.host_id = u.user_id
+    LEFT JOIN images i ON i.property_id = p.property_id
   `;
   const conditions = [];
   const queryParameters = [];
