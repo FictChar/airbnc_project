@@ -6,7 +6,8 @@ const {
   usersData, 
   propertiesData, 
   reviewsData, 
-  imagesData 
+  imagesData,
+  propertyTypesData 
 } = require("./data/test/index.js")
 const { 
   formatProperties, 
@@ -16,8 +17,9 @@ const {
   formattedImages
 } = require("./data/utils/utils.js")
 
-async function seed (propertyTypesData, usersData, propertiesData, reviewsData, imagesData) {
-
+async function seed () {
+try {
+  console.log("Seeding database...");
     await dropTables();
     await createTables();
     
@@ -80,6 +82,10 @@ await db.query(
     formattedImagesData
   )
 );
+console.log("Seeding complete!");
+} catch (error) {
+  console.log("Error seeding database:", error);
+  }
 }
 
 module.exports = seed

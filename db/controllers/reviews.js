@@ -2,7 +2,6 @@ const db = require("../connection");
 
 const { 
   getReviewsByPropertyId, 
-  getUsersById,
   createNewReview,
   deleteReview
 } = require("../models/reviews");

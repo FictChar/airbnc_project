@@ -53,32 +53,37 @@ return query.rows;
 }
 
 async function getPropertyById(propertyId) {
-  const propertyByIdQuery = 
-  `SELECT 
+  const propertyByIdQuery = `
+    SELECT 
       p.property_id,
       p.name AS property_name,
       p.location,
+      p.property_type, -- add this
       p.price_per_night::float AS price_per_night,
       p.description,
       (u.first_name || ' ' || u.surname) AS host,
       u.avatar AS host_avatar,
-       (
-        SELECT json_built_object (
-        'url', i.image_url,
-        'alt', i.alt_text
-         )
-        FROM images i
-        WHERE i.property_id = p.property_id
-        ORDER BY i.image_id ASC
-        LIMIT 1
-      ) AS property_image  
-      FROM properties p
-      JOIN users u ON p.host_id = u.user_id
-      WHERE p.property_id = $1
-      `;
+      COALESCE(
+        (
+          SELECT json_build_object(
+            'url', i.image_url,
+            'alt', i.alt_text
+          )
+          FROM images i
+          WHERE i.property_id = p.property_id
+          ORDER BY i.image_id ASC
+          LIMIT 1
+        ), '{}'::json
+      ) AS property_image
+    FROM properties p
+    JOIN users u ON p.host_id = u.user_id
+    WHERE p.property_id = $1
+  `;
+  
   const { rows } = await db.query(propertyByIdQuery, [propertyId]);
-  return rows[0];
+  return rows[0] || null; // return null if not found
 }
+
 
      // If we add more images in the future, use: (
       //   SELECT json_agg(i.image_url)
