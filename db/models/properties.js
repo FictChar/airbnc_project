@@ -61,9 +61,12 @@ async function getPropertyById(propertyId) {
       p.price_per_night::float AS price_per_night,
       p.description,
       (u.first_name || ' ' || u.surname) AS host,
-      u.avatar AS host_avatar
+      u.avatar AS host_avatar,
        (
-        SELECT i.image_url
+        SELECT json_built_object (
+        'url', i.image_url,
+        'alt', i.alt_text
+         )
         FROM images i
         WHERE i.property_id = p.property_id
         ORDER BY i.image_id ASC
